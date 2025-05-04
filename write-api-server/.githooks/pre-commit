@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+sbt clean reload
+sbt scalafmtAll
+sbt "scalafixAll --check"
+sbt -v +test
+git add .

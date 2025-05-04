@@ -1,0 +1,97 @@
+x-environment: &seed-nodes-environment
+  SEED_PORT: 2551
+  SEED_NODES.0: "akka://write-api-server@write-api-server-node1:2551"
+  SEED_NODES.1: "akka://write-api-server@write-api-server-node2:2551"
+  SEED_NODES.2: "akka://write-api-server@write-api-server-node3:2551"
+
+services:
+  write-api-server-node1:
+    image: cqrs-es-example-write-api-server
+    container_name: write-api-server-node1
+    platform: linux/arm64
+    environment:
+      <<: *seed-nodes-environment
+      SEED_HOSTNAME: write-api-server-node1
+    ports:
+      - "8080:8080"
+    depends_on:
+      dynamosetup:
+        condition: service_completed_successfully
+    networks:
+      - backend-network
+
+  write-api-server-node2:
+    image: cqrs-es-example-write-api-server
+    container_name: write-api-server-node2
+    platform: linux/arm64
+    environment:
+      <<: *seed-nodes-environment
+      SEED_HOSTNAME: write-api-server-node2
+      SERVER_PORT: 8081
+    ports:
+      - "8081:8081"
+    depends_on:
+      dynamosetup:
+        condition: service_completed_successfully
+    networks:
+      - backend-network
+
+  write-api-server-node3:
+    image: cqrs-es-example-write-api-server
+    container_name: write-api-server-node3
+    platform: linux/arm64
+    environment:
+      <<: *seed-nodes-environment
+      SEED_HOSTNAME: write-api-server-node3
+      SERVER_PORT: 8082
+    ports:
+      - "8082:8082"
+    depends_on:
+      dynamosetup:
+        condition: service_completed_successfully
+    networks:
+      - backend-network
+
+  dynamodb:
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb
+    expose:
+      - "8000"
+    ports:
+      - 8000:8000
+    command: "-jar DynamoDBLocal.jar -sharedDb -inMemory"
+    volumes:
+      - ./write-api-server/target/persistence/dynamodb/data:/data
+    networks:
+      - backend-network
+
+  dynamodb-admin:
+    container_name: dynamodb-admin
+    image: aaronshaf/dynamodb-admin:latest
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb:8000
+    ports:
+      - 8001:8001
+    depends_on:
+      - dynamodb
+    networks:
+      - backend-network
+
+  dynamosetup:
+    image: infrastructureascode/aws-cli
+    env_file:
+      - ./.env/.env.test
+    environment:
+      LOCALSTACK_HOST: "dynamodb"
+      DDB_PORT: 8000
+    entrypoint: /scripts/dynamodb/entrypoint.sh
+    volumes:
+      - "./write-api-server/scripts/dynamodb:/scripts/dynamodb"
+    depends_on:
+      - dynamodb
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge
