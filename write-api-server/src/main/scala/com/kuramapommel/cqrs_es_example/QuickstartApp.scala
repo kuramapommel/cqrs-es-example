@@ -22,7 +22,7 @@ object QuickstartApp:
     // Akka HTTP still needs a classic ActorSystem to start
     import system.executionContext
 
-    val port = system.settings.config.getInt("my-app.server.port")
+    val port = system.settings.config.getInt("cqrs-es-example.server.port")
     val futureBinding = Http().newServerAt("0.0.0.0", port).bind(routes)
     futureBinding.onComplete:
       case Success(binding) =>

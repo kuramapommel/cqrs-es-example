@@ -1,5 +1,6 @@
 package com.kuramapommel.cqrs_es_example.adapter.controller
 
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport.*
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.*
 import akka.util.Timeout
@@ -19,6 +20,8 @@ object ReservationRoutes:
 class ReservationRoutes(
     reservationUseCase: ReservationUseCase
 )(using Timeout):
+  import ReservationRoutes.*
+
   val routes =
     cookie("userId"): userId =>
       given ServiceContext = ServiceContext(userId.value)
@@ -26,8 +29,9 @@ class ReservationRoutes(
       pathPrefix("api" / "reservation"):
         pathEnd:
           post:
-            onSuccess(reservationUseCase.execute("test-table")):
-              case Event.Confirmed(reservationId, _, _) =>
-                complete((StatusCodes.OK, s"""{"reservation_id":"${reservationId.getValue}"}"""))
-              case error =>
-                complete((StatusCodes.InternalServerError, s"""{"message":"${error.toString()}"}"""))
+            entity(as[ReservationRequest]): reservationRequest =>
+              onSuccess(reservationUseCase.execute(reservationRequest.tableId)):
+                case Event.Confirmed(reservationId, _, _) =>
+                  complete((StatusCodes.OK, s"""{"reservation_id":"${reservationId.getValue}"}"""))
+                case error =>
+                  complete((StatusCodes.InternalServerError, s"""{"message":"${error.toString()}"}"""))
