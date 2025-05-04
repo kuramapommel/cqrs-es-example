@@ -11,6 +11,7 @@ import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import com.kuramapommel.cqrs_es_example.adapter.aggregate.reservation.ReservationActor.Command as ReservationCommand
 import com.kuramapommel.cqrs_es_example.adapter.aggregate.table_management.TableActor.Command as TableCommand
+import com.kuramapommel.cqrs_es_example.domain.DomainEvent
 import com.kuramapommel.cqrs_es_example.domain.reservation.Event
 import com.kuramapommel.cqrs_es_example.domain.reservation.ReservationId
 import com.kuramapommel.cqrs_es_example.domain.reservation.ReservationIdFactory
@@ -28,7 +29,7 @@ class ReservationUseCaseImpl(
     tableActor: ActorRef[TableCommand]
 )(using system: ActorSystem[?])
     extends ReservationUseCase:
-  override def execute(tableId: String)(using ctx: ServiceContext): Timeout ?=> Future[Event] =
+  override def execute(tableId: String)(using ctx: ServiceContext): Timeout ?=> Future[DomainEvent] =
     given ExecutionContext = system.executionContext
     given Scheduler = system.classicSystem.scheduler
 

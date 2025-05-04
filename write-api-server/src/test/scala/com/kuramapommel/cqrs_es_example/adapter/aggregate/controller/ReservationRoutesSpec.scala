@@ -1,4 +1,4 @@
-package com.kuramapommel.cqrs_es_example.adapter.controller
+package com.kuramapommel.cqrs_es_example.adapter.aggregate.controller
 
 import akka.actor.ActorSystem
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
@@ -8,6 +8,8 @@ import akka.http.scaladsl.model.*
 import akka.http.scaladsl.model.headers.Cookie
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.util.Timeout
+import com.kuramapommel.cqrs_es_example.adapter.controller.ReservationRoutes
+import com.kuramapommel.cqrs_es_example.domain.DomainEvent.DomainError
 import com.kuramapommel.cqrs_es_example.domain.reservation.Event
 import com.kuramapommel.cqrs_es_example.domain.reservation.ReservationId
 import com.kuramapommel.cqrs_es_example.usecase.ServiceContext
@@ -42,5 +44,21 @@ class ReservationRoutesSpec extends AnyWordSpec with Matchers with ScalaFutures 
       request ~> Cookie("userId" -> "test-user") ~> routes ~> check:
         status should ===(StatusCodes.OK)
         responseAs[String] should ===(s"""{"reservation_id":"${reservationId.value}"}""")
+    }
+
+    "DomainError が発生したとき, 500 を返す" in {
+      val routes = new ReservationRoutes(
+        new ReservationUseCase:
+          override def execute(tableId: String)(using ctx: ServiceContext) =
+            Future.successful(DomainError(new RuntimeException("test error")))
+      ).routes
+
+      val reservationRequest = ReservationRoutes.ReservationRequest(
+        tableId = "test-table-id"
+      )
+      val request = Post("/api/reservation").withEntity(Marshal(reservationRequest).to[MessageEntity].futureValue)
+      request ~> Cookie("userId" -> "test-user") ~> routes ~> check:
+        status should ===(StatusCodes.InternalServerError)
+        responseAs[String] should ===(s"""{"message":"test error"}""")
     }
   }

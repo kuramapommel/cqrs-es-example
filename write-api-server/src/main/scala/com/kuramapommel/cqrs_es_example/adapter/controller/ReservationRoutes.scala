@@ -1,5 +1,6 @@
 package com.kuramapommel.cqrs_es_example.adapter.controller
 
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.*
 import akka.util.Timeout
 import com.kuramapommel.cqrs_es_example.domain.reservation.Event
@@ -27,6 +28,6 @@ class ReservationRoutes(
           post:
             onSuccess(reservationUseCase.execute("test-table")):
               case Event.Confirmed(reservationId, _, _) =>
-                complete(
-                  s"""{"reservation_id":"${reservationId.getValue}"}"""
-                )
+                complete((StatusCodes.OK, s"""{"reservation_id":"${reservationId.getValue}"}"""))
+              case error =>
+                complete((StatusCodes.InternalServerError, s"""{"message":"${error.toString()}"}"""))
