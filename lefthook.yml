@@ -4,3 +4,6 @@ pre-commit:
     write-api-server:
       root: "write-api-server/"
       run: .githooks/pre-commit
+    read-model-updater:
+      root: "read-model-updater/"
+      run: .githooks/pre-commit

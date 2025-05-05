@@ -1,0 +1,12 @@
+# ベースイメージとして軽量なJava 11のイメージを使用
+FROM python:3.8
+
+COPY ./main.py /app/main.py
+COPY ./requirements.txt /app/requirements.txt
+
+RUN pip install -r /app/requirements.txt
+
+SHELL ["/bin/bash", "-c"]
+
+# アプリケーションをENTRYPOINTとして実行
+ENTRYPOINT exec python3 /app/main.py

@@ -1,0 +1,7 @@
+FROM public.ecr.aws/lambda/provided:al2
+
+COPY ./.aws-sam/build/HelloWorldFunction/bootstrap  ${LAMBDA_RUNTIME_DIR}
+RUN chmod 755 ${LAMBDA_RUNTIME_DIR}
+
+# LAMBDA_RUNTIME_DIR の実行が優先されるので, ここの文字列は自由
+CMD [ "executable" ]

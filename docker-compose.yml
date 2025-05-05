@@ -92,6 +92,67 @@ services:
     networks:
       - backend-network
 
+  read-model-updater:
+    image: cqrs-es-example-read-model-updater
+    container_name: read-model-updater
+    platform: linux/arm64
+    environment:
+      DATABASE_URL: "mysql://DUMMYUSER:DUMMYPASSWORD@mysql:3306/cqrs_es_example"
+    expose:
+      - "8080"
+    depends_on:
+      dynamosetup:
+        condition: service_completed_successfully
+    networks:
+      - backend-network
+
+  dynamodb-observer:
+    image: cqrs-es-example-dynamodb-observer
+    env_file:
+      - ./.env/.env.test
+    container_name: dynamodb-observer
+    platform: linux/arm64
+    environment:
+      DYNAMODB_HOSTNAME: "dynamodb"
+      READ_MODEL_UPDATER_HOSTNAME: "read-model-updater"
+    depends_on:
+      read-model-updater:
+        condition: service_started
+    networks:
+      - backend-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    platform: linux/amd64 # M1 Mac など ARM アーキテクチャの場合に指定
+    environment:
+      MYSQL_ROOT_PASSWORD: DUMMYROOTPASSWORD
+      MYSQL_DATABASE: cqrs_es_example
+      MYSQL_USER: DUMMYUSER
+      MYSQL_PASSWORD: DUMMYPASSWORD
+      TZ: Asia/Tokyo
+    expose:
+      - "3306"
+    volumes:
+      - ./read-api-server/database/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./read-api-server/database/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - backend-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "3306:80" # ホストの 8080 → コンテナの 80
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    depends_on:
+      - mysql
+    networks:
+      - backend-network
+
 networks:
   backend-network:
     driver: bridge

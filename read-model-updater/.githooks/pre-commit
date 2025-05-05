@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+cd rust_app 
+cargo fmt 
+cargo clippy -- -D warnings 
+cargo test 
+cd .. 
+git add . 
