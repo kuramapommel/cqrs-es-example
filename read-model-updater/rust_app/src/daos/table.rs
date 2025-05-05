@@ -1,7 +1,12 @@
+use std::future::Future;
+
 use sqlx::{prelude::FromRow, MySqlPool};
 
 pub trait TableDao {
-    async fn upsert(&self, payload: UpsertTable<'_>) -> anyhow::Result<TableEntity>;
+    fn upsert(
+        &self,
+        payload: UpsertTable<'_>,
+    ) -> impl Future<Output = anyhow::Result<TableEntity>> + Send;
 }
 
 pub struct TableDaoForMySQL {

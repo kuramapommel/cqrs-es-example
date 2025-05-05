@@ -1,8 +1,16 @@
+use std::future::Future;
+
 use sqlx::{prelude::FromRow, MySqlPool};
 
 pub trait ReservationDao {
-    async fn upsert(&self, payload: UpsertReservation<'_>) -> anyhow::Result<ReservationEntity>;
-    async fn delete(&self, payload: DeleteReservation<'_>) -> anyhow::Result<String>;
+    fn upsert(
+        &self,
+        payload: UpsertReservation<'_>,
+    ) -> impl Future<Output = anyhow::Result<ReservationEntity>> + Send;
+    fn delete(
+        &self,
+        payload: DeleteReservation<'_>,
+    ) -> impl Future<Output = anyhow::Result<String>> + Send;
 }
 
 pub struct ReservationDaoForMySQL {

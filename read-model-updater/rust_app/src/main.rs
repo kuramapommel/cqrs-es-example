@@ -1,19 +1,11 @@
 mod application_services;
 mod daos;
-mod event_deserializers;
+mod deserializers;
 mod handlers;
 
-use application_services::reservations::reservation_cancel_service::ReservationCancelService;
-use application_services::reservations::reservation_make_service::ReservationMakeService;
-use application_services::table_managements::reservation_confirm_service::ReservationConfirmService;
-use daos::reservation::ReservationDaoForMySQL;
-use daos::table::TableDaoForMySQL;
-use event_deserializers::deserializer::Deserializer;
-use handlers::table_managements::reservation_confirmed_handler::ReservationConfirmedHandler as TableManagementReservationConfirmedHandler;
-use handlers::{
-    event_handler::EventHandler,
-    reservations::reservation_confirmed_handler::ReservationConfirmedHandler,
-};
+use deserializers::deserializer::Deserializer;
+use handlers::reservations::create_reservation_handlers;
+use handlers::{event_handler::EventHandler, table_managements::create_table_management_handlers};
 use lambda_runtime::{run, service_fn, Error, LambdaEvent};
 use serde::{Deserialize, Serialize};
 use sqlx::mysql::MySqlPoolOptions;
@@ -69,30 +61,20 @@ async fn main() -> Result<(), Error> {
         .connect(&database_url)
         .await?;
 
-    let handlers: Vec<Arc<dyn EventHandler>> = vec![
-        // 予約コンテキスト
-        Arc::new(ReservationConfirmedHandler::new(
-            ReservationMakeService::new(ReservationDaoForMySQL::new(pool.clone())),
-        )),
-        Arc::new(
-            handlers::reservations::reservation_cancelled_handler::ReservationCancelledHandler::new(
-                ReservationCancelService::new(ReservationDaoForMySQL::new(pool.clone())),
-            ),
-        ),
-        // テーブル管理コンテキスト
-        Arc::new(TableManagementReservationConfirmedHandler::new(
-            ReservationConfirmService::new(TableDaoForMySQL::new(pool.clone())),
-        )),
-    ];
+    let handlers: Vec<Arc<dyn EventHandler>> = [
+        create_reservation_handlers(&pool),
+        create_table_management_handlers(&pool),
+    ]
+    .concat();
 
     // AWS Lambda のエントリポイント
     let event_handler = Box::new(move |event: LambdaEvent<Request>| {
-        let deserialized_event =
+        let (payload, manifest) =
             Deserializer::deserialize(event.payload).expect("Failed to deserialize payload");
 
         handlers
             .iter()
-            .find_map(|h| h.handle_or_none(deserialized_event.clone()))
+            .find_map(|h| h.handle_or_none(&payload, &manifest))
             .expect("No suitable handler found")
     });
     run(service_fn(event_handler)).await
