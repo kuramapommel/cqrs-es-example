@@ -153,6 +153,19 @@ services:
     networks:
       - backend-network
 
+  read-api-server:
+    image: cqrs-es-example-read-api-server
+    container_name: read-api-server
+    environment:
+      DATABASE_URL: "mysql://DUMMYUSER:DUMMYPASSWORD@mysql:3306/cqrs_es_example"
+    ports:
+      - "3080:3080"
+    depends_on:
+      mysql:
+        condition: service_started
+    networks:
+      - backend-network
+
 networks:
   backend-network:
     driver: bridge

@@ -1,0 +1,20 @@
+{
+  "name": "read-api-server",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "prisma:b": "npx prisma generate",
+    "bundle": "bun build ./src/index.ts --outfile ./dist/bundle.js --target bun --minify",
+    "test": "vitest",
+    "lint": "bunx biome check src",
+    "format": "bunx biome check src --write"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.7.0",
+    "hono": "^4.7.8"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "prisma": "^6.7.0",
+    "vitest": "^3.1.3"
+  }
+}

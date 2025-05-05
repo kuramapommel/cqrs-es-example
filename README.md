@@ -14,3 +14,7 @@ curl -X POST http://localhost:8080/api/reservation \
   -H "Content-Type: application/json" \
   -d '{"tableId": "test-table-id"}'
 ```
+
+```sh
+curl http://localhost:3080/reservations
+```

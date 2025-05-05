@@ -13,7 +13,7 @@ SAM_BUILD_MODE=debug sam build --beta-features
 docker build --platform linux/arm64 -t cqrs-es-example-read-model-updater -f Dockerfile.lambda .
 ```
 
-## for kubernetes
+## Preparing for Kubernetes
 
 ```sh
 docker tag cqrs-es-example-read-model-updater:latest kuramapommel/cqrs-es-example-read-model-updater:latest
