@@ -2,6 +2,8 @@
 
 ## 環境構築
 
+git hooks で lefthook を使うように設定する
+
 ```sh
 lefthook install
 ```
@@ -23,6 +25,16 @@ curl -X POST http://localhost:8080/api/reservation \
 
 ```sh
 curl http://localhost:3080/reservations
+```
+
+### Gauge による e2e
+
+[`web-frontend`](./web-frontend/README.md) が起動している状態で実行する
+
+```sh
+cd specs/web
+
+npm run test
 ```
 
 ### docker compose
