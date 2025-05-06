@@ -3,6 +3,7 @@ package com.kuramapommel.cqrs_es_example
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.Route
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
@@ -10,6 +11,7 @@ import akka.util.Timeout
 import com.kuramapommel.cqrs_es_example.adapter.aggregate.reservation.ShardedReservationActor
 import com.kuramapommel.cqrs_es_example.adapter.aggregate.table_management.ShardedTableActor
 import com.kuramapommel.cqrs_es_example.adapter.controller.ReservationRoutes
+import com.kuramapommel.cqrs_es_example.adapter.controller.routes
 import com.kuramapommel.cqrs_es_example.adapter.usecase.reservation.ReservationUseCaseImpl
 import com.kuramapommel.cqrs_es_example.domain.reservation.ReservationIdFactory
 import scala.util.Failure
@@ -48,7 +50,7 @@ object QuickstartApp:
 
       val reservationRoutes = new ReservationRoutes(reservationUseCase)
 
-      startHttpServer(reservationRoutes.routes)
+      startHttpServer(reservationRoutes.routes ~ routes)
 
       if context.system.settings.config
           .getBoolean("cqrs-es-example.use-akka-management")

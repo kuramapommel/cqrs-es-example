@@ -23,15 +23,16 @@ class ReservationRoutes(
   import ReservationRoutes.*
 
   val routes =
-    cookie("userId"): userId =>
-      given ServiceContext = ServiceContext(userId.value)
+    cors():
+      cookie("userId"): userId =>
+        given ServiceContext = ServiceContext(userId.value)
 
-      pathPrefix("api" / "reservation"):
-        pathEnd:
-          post:
-            entity(as[ReservationRequest]): reservationRequest =>
-              onSuccess(reservationUseCase.execute(reservationRequest.tableId)):
-                case Event.Confirmed(reservationId, _, _) =>
-                  complete((StatusCodes.OK, s"""{"reservation_id":"${reservationId.getValue}"}"""))
-                case error =>
-                  complete((StatusCodes.InternalServerError, s"""{"message":"${error.toString()}"}"""))
+        pathPrefix("api" / "reservation"):
+          pathEnd:
+            post:
+              entity(as[ReservationRequest]): reservationRequest =>
+                onSuccess(reservationUseCase.execute(reservationRequest.tableId)):
+                  case Event.Confirmed(reservationId, _, _) =>
+                    complete((StatusCodes.OK, s"""{"reservation_id":"${reservationId.getValue}"}"""))
+                  case error =>
+                    complete((StatusCodes.InternalServerError, s"""{"message":"${error.toString()}"}"""))

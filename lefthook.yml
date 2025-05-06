@@ -10,3 +10,6 @@ pre-commit:
     read-api-server:
       root: "read-api-server/"
       run: .githooks/pre-commit
+    web-frontend:
+      root: "web-frontend/"
+      run: .githooks/pre-commit
