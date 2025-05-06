@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: write-api-server
+  name: write-api-server
+  namespace: cqrs-es-example
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: write-api-server
+  template:
+    metadata:
+      labels:
+        app: write-api-server
+    spec:
+      containers:
+        - name: write-api-server
+          image: kuramapommel/cqrs-es-example-write-api-server:latest
+          ports:
+            - name: management
+              containerPort: 8558
+              protocol: TCP
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: REQUIRED_CONTACT_POINT_NR
+              value: "2"
+            - name: SERVER_PORT
+              value: "8080"
+            - name: DYNAMODB_HOST
+              value: "dynamodb-local-service.cqrs-es-example"
+            - name: USE_AKKA_MANAGEMENT
+              value: "true"
+          resources:
+            limits:
+              memory: 1024Mi
+            requests:
+              cpu: 2
+              memory: 1024Mi
+---
+# kubernetes-api を利用するために必要な権限設定
+# https://doc.akka.io/libraries/akka-management/current/kubernetes-deployment/forming-a-cluster.html#role-based-access-control
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pod-reader
+  namespace: cqrs-es-example
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "watch", "list"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: read-pods
+  namespace: cqrs-es-example
+subjects:
+  - kind: User
+    name: system:serviceaccount:cqrs-es-example:default
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: write-api-server-api-service
+  namespace: cqrs-es-example
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: write-api-server

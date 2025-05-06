@@ -20,5 +20,4 @@ docker tag cqrs-es-example-read-model-updater:latest kuramapommel/cqrs-es-exampl
 docker push kuramapommel/cqrs-es-example-read-model-updater:latest
 docker tag cqrs-es-example-dynamodb-observer:latest kuramapommel/cqrs-es-example-dynamodb-observer:latest
 docker push kuramapommel/cqrs-es-example-dynamodb-observer:latest
-kubectl apply -f ./kubernetes/read-model-updater.yml
 ```

@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dynamodb-local-deployment
+  namespace: cqrs-es-example
+spec:
+  selector:
+    matchLabels:
+      app: dynamodb-local
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dynamodb-local
+    spec:
+      containers:
+        - name: dynamodb-local
+          image: amazon/dynamodb-local:latest
+          ports:
+            - containerPort: 8000
+          args: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"]
+          volumeMounts:
+            - mountPath: /data
+              name: data-volume
+      volumes:
+        - name: data-volume
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dynamodb-local-service
+  namespace: cqrs-es-example
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      nodePort: 30000
+  selector:
+    app: dynamodb-local
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dynamodb-setup-pod
+  labels:
+    app: dynamodb-setup-pod
+  namespace: cqrs-es-example
+spec:
+  restartPolicy: Never # 再起動しない設定
+  containers:
+    - name: dynamodb-setup
+      image: infrastructureascode/aws-cli
+      env:
+        - name: AWS_ACCESS_KEY_ID
+          value: "DUMMYAWSACCESSKEYID"
+        - name: AWS_SECRET_ACCESS_KEY
+          value: "DUMMYAWSSECRETACCESSKEY"
+        - name: AWS_DEFAULT_REGION
+          value: "us-east-1"
+        - name: AWS_REGION
+          value: "us-east-1"
+        - name: LOCALSTACK_HOST
+          value: "dynamodb-local-service.cqrs-es-example"
+        - name: DDB_PORT
+          value: "8000"
+      volumeMounts:
+        - name: scripts-volume
+          mountPath: /scripts/dynamodb
+      command: ["/scripts/dynamodb/entrypoint.sh"]
+  volumes:
+    - name: scripts-volume
+      hostPath:
+        path: "/scripts/dynamodb"
+        type: Directory
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dynamodb-admin-deployment
+  namespace: cqrs-es-example
+spec:
+  selector:
+    matchLabels:
+      app: dynamodb-admin
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dynamodb-admin
+    spec:
+      containers:
+        - name: dynamodb-admin
+          image: aaronshaf/dynamodb-admin:4.6.1
+          ports:
+            - containerPort: 8001
+          env:
+            - name: DYNAMO_ENDPOINT
+              value: "dynamodb-local-service.cqrs-es-example:8000"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dynamodb-admin-service
+  namespace: cqrs-es-example
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8001
+      targetPort: 8001
+      protocol: TCP
+  selector:
+    app: dynamodb-admin

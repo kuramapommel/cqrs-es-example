@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: read-model-updater
+  name: read-model-updater
+  namespace: cqrs-es-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: read-model-updater
+  template:
+    metadata:
+      labels:
+        app: read-model-updater
+    spec:
+      containers:
+        - name: read-model-updater
+          image: kuramapommel/cqrs-es-example-read-model-updater:latest
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: DATABASE_URL
+              value: "mysql://DUMMYUSER:DUMMYPASSWORD@mysql-local-service.cqrs-es-example:3306/cqrs-es-example"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: read-model-updater-service
+  namespace: cqrs-es-example
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 30080
+  selector:
+    app: read-model-updater
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dynamodb-observer
+  name: dynamodb-observer
+  namespace: cqrs-es-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dynamodb-observer
+  template:
+    metadata:
+      labels:
+        app: dynamodb-observer
+    spec:
+      containers:
+        - name: dynamodb-observer
+          image: kuramapommel/cqrs-es-example-dynamodb-observer:latest
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: DYNAMODB_HOSTNAME
+              value: "dynamodb-local-service.cqrs-es-example"
+            - name: READ_MODEL_UPDATER_HOSTNAME
+              value: "read-model-updater-service.cqrs-es-example"
+            - name: AWS_ACCESS_KEY_ID
+              value: "DUMMYAWSACCESSKEYID"
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "DUMMYAWSSECRETACCESSKEY"
+            - name: AWS_DEFAULT_REGION
+              value: "us-east-1"
+            - name: AWS_REGION
+              value: "us-east-1"
+            - name: LOCALSTACK_HOST
+              value: "dynamodb-local-service.cqrs-es-example"
+            - name: DDB_PORT
+              value: "8000"

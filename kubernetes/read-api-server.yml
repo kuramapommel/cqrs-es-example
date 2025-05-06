@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: read-api-server
+  name: read-api-server
+  namespace: cqrs-es-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: read-api-server
+  template:
+    metadata:
+      labels:
+        app: read-api-server
+    spec:
+      containers:
+        - name: read-api-server
+          image: kuramapommel/cqrs-es-example-read-api-server:latest
+          ports:
+            - name: http
+              containerPort: 3080
+              protocol: TCP
+          env:
+            - name: DATABASE_URL
+              value: "mysql://DUMMYUSER:DUMMYPASSWORD@mysql-local-service.cqrs-es-example:3306/cqrs-es-example"
+          resources:
+            limits:
+              memory: 1024Mi
+            requests:
+              cpu: 2
+              memory: 1024Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: read-api-server-api-service
+  namespace: cqrs-es-example
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 3080
+      targetPort: 3080
+      protocol: TCP
+  selector:
+    app: read-api-server

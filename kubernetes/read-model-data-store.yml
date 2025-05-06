@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-local
+  namespace: cqrs-es-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-local
+  template:
+    metadata:
+      labels:
+        app: mysql-local
+    spec:
+      containers:
+        - name: mysql-local
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "DUMMYROOTPASSWORD"
+            - name: MYSQL_DATABASE
+              value: "cqrs-es-example"
+            - name: MYSQL_USER
+              value: "DUMMYUSER"
+            - name: MYSQL_PASSWORD
+              value: "DUMMYPASSWORD"
+            - name: TZ
+              value: "Asia/Tokyo"
+          volumeMounts:
+            - name: my-cnf
+              mountPath: /etc/mysql/conf.d/my.cnf
+            - name: initdb
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: my-cnf
+          hostPath:
+            path: "/database/my.cnf"
+            type: File
+        - name: initdb
+          hostPath:
+            path: "/database/docker-entrypoint-initdb.d"
+            type: Directory
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-local-service
+  namespace: cqrs-es-example
+spec:
+  type: NodePort
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+      nodePort: 30306
+  selector:
+    app: mysql-local
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin-deployment
+  namespace: cqrs-es-example
+spec:
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+        - name: phpmyadmin
+          image: phpmyadmin/phpmyadmin:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: PMA_HOST
+              value: "mysql-local-service.cqrs-es-example"
+            - name: PMA_PORT
+              value: "3306"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpmyadmin-service
+  namespace: cqrs-es-example
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 3306
+      targetPort: 80
+      protocol: TCP
+  selector:
+    app: phpmyadmin

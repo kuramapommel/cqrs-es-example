@@ -1,0 +1,8 @@
+# サンプルコードを参考に namespace を定義
+# https://doc.akka.io/libraries/akka-management/current/attachments/akka-sample-cluster-kubernetes-scala.zip
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cqrs-es-example
+  labels:
+    name: cqrs-es-example
