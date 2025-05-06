@@ -17,13 +17,13 @@ const MakeReservationForm = ({ userId, onMade }: Props) => {
     <form onSubmit={handleSubmit}>
       <input
         onChange={handleTableIdChange}
-        aria-label="table-id"
+        aria-label="テーブル ID 入力欄"
         type="text"
         name="table_id"
         placeholder="Table ID"
         value={tableId}
       />
-      <button type="submit">Make Reservation</button>
+      <button type="submit">予約登録</button>
     </form>
   );
 };

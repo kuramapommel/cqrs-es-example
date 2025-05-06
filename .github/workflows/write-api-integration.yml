@@ -1,0 +1,39 @@
+name: CI for write API
+
+on:
+  push:
+    branches:
+      - v3
+    paths:
+      - "write-api-server/**"
+      - ".github/workflows/write-api-integration.yml"
+  pull_request:
+    branches:
+      - v3
+    paths:
+      - "write-api-server/**"
+      - ".github/workflows/write-api-integration.yml"
+
+jobs:
+  write-model:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: write-api-server
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - uses: sbt/setup-sbt@v1
+
+      - name: Check Format
+        run: sbt scalafmtCheck
+
+      - name: Build and Test
+        run: sbt -v +test

@@ -17,6 +17,6 @@ datasource db {
 
 model reservations {
   id String @id
-  user_id String @unique
+  user_id String
   table_id String @unique
 }

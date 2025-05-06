@@ -80,7 +80,7 @@ services:
   dynamosetup:
     image: infrastructureascode/aws-cli
     env_file:
-      - ./.env/.env.test
+      - ./.envfile/.env.test
     environment:
       LOCALSTACK_HOST: "dynamodb"
       DDB_PORT: 8000
@@ -109,7 +109,7 @@ services:
   dynamodb-observer:
     image: cqrs-es-example-dynamodb-observer
     env_file:
-      - ./.env/.env.test
+      - ./.envfile/.env.test
     container_name: dynamodb-observer
     platform: linux/arm64
     environment:

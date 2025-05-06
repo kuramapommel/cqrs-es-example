@@ -1,4 +1,4 @@
-import type { Reservation } from "@/app/types";
+import type { Reservation } from "@/app/reservation/types";
 import { renderHook, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import useReservationForm from "../use-reservation-form";

@@ -1,0 +1,45 @@
+name: CI for mobile app
+
+on:
+  push:
+    branches:
+      - v3
+    paths:
+      - "web-frontend/**"
+      - ".github/workflows/web-frontend-integration.yml"
+  pull_request:
+    branches:
+      - v3
+    paths:
+      - "web-frontend/**"
+      - ".github/workflows/web-frontend-integration.yml"
+
+jobs:
+  frontend:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web-frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: "web-frontend/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Frontend Unit Tests
+        run: npm run test
+
+      - name: Install Playwright
+        run: npx playwright install --with-deps
+
+      - name: Run Component Tests
+        run: npm run storybook:ci

@@ -1,28 +1,21 @@
-import ReservationTable from "./_components/reservation-table";
-import type { Reservation } from "./types";
+"use client";
 
-export default async function Home() {
-  const { userId } = await fetch("http://localhost:8080/api/backdoor", {
-    credentials: "include",
-    method: "POST",
-  }).then((res) => res.json());
-  const reservations: Reservation[] = await fetch(
-    `http://localhost:3080/api/reservations?user_id=${userId}`,
-  )
-    .then((res) => res.json())
-    .catch((err) => {
-      console.log(err);
-      return [];
-    });
+import Link from "next/link";
+import { useEffect } from "react";
 
+export default function Home() {
+  useEffect(() => {
+    const fetchUserId = async () => {
+      await fetch("http://localhost:8080/api/backdoor", {
+        credentials: "include",
+        method: "POST",
+      });
+    };
+    fetchUserId();
+  });
   return (
-    <>
-      <header>
-        <h1>Reservations</h1>
-      </header>
-      <main>
-        <ReservationTable userId={userId} reservations={reservations} />
-      </main>
-    </>
+    <Link href="/reservation" aria-label="予約ページリンク">
+      Reservation
+    </Link>
   );
 }

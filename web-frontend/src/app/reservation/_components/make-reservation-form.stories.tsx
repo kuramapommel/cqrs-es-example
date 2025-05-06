@@ -51,7 +51,7 @@ export const Default: Story = {
     const makeReservationButton = await canvas.findByRole("button", {
       name: "Make Reservation",
     });
-    const tableIdInput = await canvas.findByLabelText("table-id");
+    const tableIdInput = await canvas.findByLabelText("テーブル ID 入力欄");
     await waitFor(() => {
       expect(makeReservationButton).toBeEnabled();
       expect(tableIdInput).toBeInTheDocument();
@@ -71,14 +71,17 @@ export const MakeReservationButton: Story = {
   ) => {
     await Default.play?.(ctx);
     const canvas = within(ctx.canvasElement);
-    await userEvent.type(canvas.getByLabelText("table-id"), "test-table-id");
+    await userEvent.type(
+      canvas.getByLabelText("テーブル ID 入力欄"),
+      "test-table-id",
+    );
     await userEvent.click(
       canvas.getByRole("button", {
-        name: "Make Reservation",
+        name: "予約登録",
       }),
     );
     await waitFor(() => {
-      expect(canvas.getByLabelText("table-id")).toHaveValue("");
+      expect(canvas.getByLabelText("テーブル ID 入力欄")).toHaveValue("");
     });
   },
 };
