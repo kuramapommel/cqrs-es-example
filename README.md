@@ -89,3 +89,45 @@ kubectl delete -f ./kubernetes/read-model-data-store.yml
 kubectl delete -f ./kubernetes/write-model-data-store.yml
 kubectl delete -f ./kubernetes/namespace.yml
 ```
+
+## リポジトリ構成
+
+本リポジトリは [CQRS + ES](https://zenn.dev/kuramapommel/articles/self-study_actor-model-using-akka#cqrs-%2B-es) 構成の実装例です.
+
+```bash
+.
+└── cqrs-es-example/
+    ├── read-api-server/
+    ├── read-model-updater/
+    ├── specs/
+    ├── web-frontend/
+    └── write-api-server/
+```
+
+```mermaid
+block-beta
+columns 1
+  WebFrontend["web-frontend"]
+  space
+  block
+    WriteApiServer["write-api-server"]
+    ReadApiServer["read-api-server"]
+  end
+  block
+    block:WriteModel
+      DynamoDB["DynamoDB"]
+      block
+        Journal[("journal")]
+        Snapshot[("snapshot")]
+      end
+    end
+    ReadModel[("MySQL")]
+  end
+  WebFrontend --> WriteApiServer
+  WebFrontend --> ReadApiServer
+  WriteApiServer --> WriteModel
+  WriteModel --> ReadModel
+  ReadApiServer --> ReadModel
+  style WriteModel stroke:#000
+  style DynamoDB stroke:#fff
+```
