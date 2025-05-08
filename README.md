@@ -97,37 +97,41 @@ kubectl delete -f ./kubernetes/namespace.yml
 ```bash
 .
 └── cqrs-es-example/
-    ├── read-api-server/
-    ├── read-model-updater/
-    ├── specs/
-    ├── web-frontend/
-    └── write-api-server/
+    ├── read-api-server/ # read model
+    ├── read-model-updater/ # read model updater
+    ├── specs/ # Gauge による仕様
+    ├── web-frontend/ # web フロントエンド
+    └── write-api-server/ # write model
 ```
 
 ```mermaid
-block-beta
-columns 1
-  WebFrontend["web-frontend"]
-  space
-  block
-    WriteApiServer["write-api-server"]
-    ReadApiServer["read-api-server"]
-  end
-  block
-    block:WriteModel
-      DynamoDB["DynamoDB"]
-      block
-        Journal[("journal")]
-        Snapshot[("snapshot")]
-      end
+%%{init: {'theme':'forest'}}%%
+  block-beta
+  columns 1
+    WebFrontend["web-frontend"]
+    space
+    block
+      WriteApiServer["write-api-server"]
+      ReadApiServer["read-api-server"]
     end
-    ReadModel[("MySQL")]
-  end
-  WebFrontend --> WriteApiServer
-  WebFrontend --> ReadApiServer
-  WriteApiServer --> WriteModel
-  WriteModel --> ReadModel
-  ReadApiServer --> ReadModel
-  style WriteModel stroke:#000
-  style DynamoDB stroke:#fff
+    space
+    block
+      block:WriteModel
+        DynamoDB["DynamoDB"]
+        block:tables
+          Journal[("journal")]
+          Snapshot[("snapshot")]
+        end
+      end
+      ReadModel[("MySQL")]
+    end
+    WebFrontend --> WriteApiServer
+    WebFrontend --> ReadApiServer
+    WriteApiServer --> WriteModel
+    WriteModel space:2 ReadModel
+    WriteModel --> ReadModel
+    ReadApiServer --> ReadModel
+    style WriteModel fill:#cde498,stroke:#13540c
+    style tables fill:#cde498,stroke:#cde498
+    style DynamoDB fill:#cde498,stroke:#cde498
 ```
