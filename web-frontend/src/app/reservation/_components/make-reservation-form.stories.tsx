@@ -49,7 +49,7 @@ export const Default: Story = {
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const makeReservationButton = await canvas.findByRole("button", {
-      name: "Make Reservation",
+      name: "予約登録",
     });
     const tableIdInput = await canvas.findByLabelText("テーブル ID 入力欄");
     await waitFor(() => {

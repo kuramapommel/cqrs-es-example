@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">cqrs-es-example</string>
+    <string name="main_activity_title">cqrs-es-example</string>
+</resources>

@@ -1,15 +1,18 @@
 pre-commit:
   parallel: true
   commands:
-    write-api-server:
-      root: "write-api-server/"
-      run: .githooks/pre-commit
-    read-model-updater:
-      root: "read-model-updater/"
+    mobile-app:
+      root: "mobile-app/"
       run: .githooks/pre-commit
     read-api-server:
       root: "read-api-server/"
       run: .githooks/pre-commit
+    read-model-updater:
+      root: "read-model-updater/"
+      run: .githooks/pre-commit
     web-frontend:
       root: "web-frontend/"
+      run: .githooks/pre-commit
+    write-api-server:
+      root: "write-api-server/"
       run: .githooks/pre-commit

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+npm run format 
+npm run lint 
+npm run test:front 
+cd src-tauri 
+cargo fmt 
+cargo clippy -- -D warnings 
+cargo test 
+cd .. 
+git add . 
