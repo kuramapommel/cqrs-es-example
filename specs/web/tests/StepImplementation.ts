@@ -14,7 +14,7 @@ export default class StepImplementation {
   }
 
   @AfterScenario()
-  public async AfterScenario() {
+  public async afterScenario() {
     await this.context.close();
     await this.page.close();
   }
