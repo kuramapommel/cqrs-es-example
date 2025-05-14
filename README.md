@@ -24,7 +24,7 @@ curl -X POST http://localhost:8080/api/reservation \
 1. 予約情報の参照
 
 ```sh
-curl http://localhost:3080/reservations
+curl http://localhost:3080/api/reservations
 ```
 
 ### Gauge による e2e
