@@ -1,4 +1,4 @@
-name: CI for mobile app
+name: CI for web frontend
 
 on:
   push:
