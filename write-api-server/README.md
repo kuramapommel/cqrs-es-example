@@ -3,7 +3,6 @@
 ## Docker build
 
 ```sh
-sbt assembly
 docker build -t cqrs-es-example-write-api-server .
 ```
 

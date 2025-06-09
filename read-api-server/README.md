@@ -3,9 +3,6 @@
 ## docker build
 
 ```sh
-bun install
-bun prisma:b
-bun bundle
 docker build -t cqrs-es-example-read-api-server .
 ```
 
