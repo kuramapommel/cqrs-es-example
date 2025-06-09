@@ -1,6 +1,17 @@
+# -------- Build stage --------
+FROM ghcr.io/cargo-lambda/cargo-lambda:latest AS builder
+
+WORKDIR /app
+COPY src ./src
+COPY Cargo.toml .
+
+RUN rustup target add aarch64-unknown-linux-musl
+RUN cargo lambda build --release --target aarch64-unknown-linux-musl
+
+# -------- STAGE 2: Runtime Layer for Lambda --------
 FROM public.ecr.aws/lambda/provided:al2
 
-COPY ./.aws-sam/build/HelloWorldFunction/bootstrap  ${LAMBDA_RUNTIME_DIR}
+COPY --from=builder /app/target/lambda/*/bootstrap ${LAMBDA_RUNTIME_DIR}
 RUN chmod 755 ${LAMBDA_RUNTIME_DIR}
 
 # LAMBDA_RUNTIME_DIR の実行が優先されるので, ここの文字列は自由

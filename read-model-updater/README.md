@@ -9,7 +9,6 @@ docker build -t cqrs-es-example-dynamodb-observer -f Dockerfile.observer .
 
 ```sh
 # lambda
-SAM_BUILD_MODE=debug sam build --beta-features
 docker build --platform linux/arm64 -t cqrs-es-example-read-model-updater -f Dockerfile.lambda .
 ```
 
