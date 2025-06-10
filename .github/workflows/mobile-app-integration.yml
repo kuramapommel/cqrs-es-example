@@ -36,7 +36,7 @@ jobs:
         run: npm ci
 
       - name: Run Frontend Unit Tests
-        run: npm run test
+        run: npm run test:front
 
       - name: Install Playwright
         run: npx playwright install --with-deps
