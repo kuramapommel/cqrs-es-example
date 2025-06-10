@@ -3,13 +3,13 @@ name: CI for mobile app
 on:
   push:
     branches:
-      - v3
+      - main
     paths:
       - "mobile-app/**"
       - ".github/workflows/mobile-app-integration.yml"
   pull_request:
     branches:
-      - v3
+      - main
     paths:
       - "mobile-app/**"
       - ".github/workflows/mobile-app-integration.yml"

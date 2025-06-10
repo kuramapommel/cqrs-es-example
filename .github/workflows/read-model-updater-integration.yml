@@ -3,13 +3,13 @@ name: CI for read model updater
 on:
   push:
     branches:
-      - v3
+      - main
     paths:
       - "read-model-updater/**"
       - ".github/workflows/read-model-updater-integration.yml"
   pull_request:
     branches:
-      - v3
+      - main
     paths:
       - "read-model-updater/**"
       - ".github/workflows/read-model-updater-integration.yml"

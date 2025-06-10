@@ -3,13 +3,13 @@ name: CI for write API
 on:
   push:
     branches:
-      - v3
+      - main
     paths:
       - "write-api-server/**"
       - ".github/workflows/write-api-integration.yml"
   pull_request:
     branches:
-      - v3
+      - main
     paths:
       - "write-api-server/**"
       - ".github/workflows/write-api-integration.yml"
