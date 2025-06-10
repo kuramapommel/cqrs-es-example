@@ -2,9 +2,9 @@
 
 set -e
 
-npm run format 
-npm run lint 
-npm run test:front 
+pnpm format 
+pnpm lint 
+pnpm test:front 
 cd src-tauri 
 cargo fmt 
 cargo clippy -- -D warnings 
