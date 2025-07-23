@@ -35,8 +35,9 @@ object TableActor:
       commandHandler = {
         case (state, Command.ConfirmReservation(_, userId, reservationId, replyTo)) =>
           val event = Event.ReservationConfirmed(state.tableId, userId, reservationId)
-          replyTo ! event
-          Effect.persist(event)
+          Effect
+            .persist(event)
+            .thenReply(replyTo)(_ => event)
         case (_, _) =>
           Effect.unhandled
       },
