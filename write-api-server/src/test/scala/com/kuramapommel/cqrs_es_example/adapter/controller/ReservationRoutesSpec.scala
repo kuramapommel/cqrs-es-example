@@ -1,4 +1,4 @@
-package com.kuramapommel.cqrs_es_example.adapter.aggregate.controller
+package com.kuramapommel.cqrs_es_example.adapter.controller
 
 import akka.actor.ActorSystem
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
@@ -8,7 +8,6 @@ import akka.http.scaladsl.model.*
 import akka.http.scaladsl.model.headers.Cookie
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import akka.util.Timeout
-import com.kuramapommel.cqrs_es_example.adapter.controller.ReservationRoutes
 import com.kuramapommel.cqrs_es_example.domain.DomainEvent.DomainError
 import com.kuramapommel.cqrs_es_example.domain.reservation.Event
 import com.kuramapommel.cqrs_es_example.domain.reservation.ReservationId
